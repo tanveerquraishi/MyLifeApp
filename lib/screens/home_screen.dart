@@ -318,11 +318,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       _isLoading = false;
                     });
                   },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    if (consoleMessage.messageLevel == ConsoleMessageLevel.ERROR) {
-                      debugPrint('WebView Error: ${consoleMessage.message}');
-                    }
-                  },
                   onUpdateVisitedHistory: (controller, url, isReload) {
                     _updateCanGoBack();
                   },
