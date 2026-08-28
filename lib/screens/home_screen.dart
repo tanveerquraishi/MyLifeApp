@@ -46,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _networkService.dispose();
-    _refreshController.dispose();
     super.dispose();
   }
 
@@ -254,7 +253,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
                       javaScriptEnabled: AppConstants.enableJavaScript,
-                      databaseEnabled: true,
                       useShouldOverrideUrlLoading: true,
                       useOnDownloadStart: true,
                       javaScriptCanOpenWindowsAutomatically: true,
