@@ -195,8 +195,8 @@ http: ^1.2.0                        # HTTP requests
 ### Development Environment
 - **Flutter Version:** 3.32.x Stable
 - **Dart Version:** 3.8+
-- **Android Gradle Plugin:** 8.1.4
-- **Gradle Version:** 8.4
+- **Android Gradle Plugin:** 8.3.0
+- **Gradle Version:** 8.5
 - **Java Version:** JDK 17
 - **Compile SDK:** 35
 - **Target SDK:** 35

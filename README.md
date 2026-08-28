@@ -16,8 +16,8 @@ A production-grade Flutter WebView application for MyLifePair Matrimony service,
 
 - **Flutter:** 3.32.x Stable
 - **Dart:** 3.8+
-- **Android Gradle Plugin:** 8.1.4
-- **Gradle:** 8.4
+- **Android Gradle Plugin:** 8.3.0
+- **Gradle:** 8.5
 - **Java:** JDK 17
 - **Android SDK:** Compile SDK 35, Target SDK 35, Min SDK 26
 - **Android Studio:** Latest Stable
