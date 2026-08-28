@@ -8,7 +8,7 @@ class AppConstants {
   static const int buildNumber = 1;
 
   // Website URL
-  static const String websiteUrl = 'https://www.mylifepair.com';
+  static const String websiteUrl = 'https://www.google.com'; // Temporarily changed for testing
 
   // Colors
   static const Color primaryColor = Color(0xFFE91E63); // Pink
