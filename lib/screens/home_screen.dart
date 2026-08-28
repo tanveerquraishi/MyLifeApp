@@ -252,7 +252,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Stack(
                   children: [
                     InAppWebView(
-                  initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
+                  initialUrlRequest: URLRequest(
+                    url: WebUri(AppConstants.websiteUrl),
+                    headers: {
+                      'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36'
+                    }
+                  ),
                   initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
                       javaScriptEnabled: AppConstants.enableJavaScript,
@@ -275,11 +280,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (kDebugMode) {
                       print('WebView created successfully');
                     }
-                    
-                    // Set custom user agent to make the app look like Chrome
-                    controller.setUserAgent(
-                      'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36'
-                    );
                   },
                   onLoadStart: (controller, url) {
                     if (kDebugMode) {
