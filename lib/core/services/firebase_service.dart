@@ -6,14 +6,17 @@ import '../../firebase_options.dart' as options;
 class FirebaseService {
   static FirebaseMessaging? _messaging;
   static bool _initialized = false;
+  static bool _available = false;
 
   static Future<void> initialize() async {
     if (_initialized) return;
 
     try {
+      // Check if Firebase is configured
       await Firebase.initializeApp(
         options: options.DefaultFirebaseOptions.currentPlatform,
       );
+      _available = true;
       
       _messaging = FirebaseMessaging.instance;
       
@@ -41,13 +44,16 @@ class FirebaseService {
         print('Firebase initialized successfully');
       }
     } catch (e) {
+      _available = false;
       if (kDebugMode) {
-        print('Firebase initialization error: $e');
+        print('Firebase not configured - running without Firebase: $e');
       }
     }
   }
 
   static Future<void> _requestPermissions() async {
+    if (!_available) return;
+    
     NotificationSettings settings = await _messaging!.requestPermission(
       alert: true,
       announcement: false,
@@ -64,6 +70,8 @@ class FirebaseService {
   }
 
   static Future<void> _configureForegroundNotifications() async {
+    if (!_available) return;
+    
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
         print('Received foreground message: ${message.notification?.title}');
@@ -73,10 +81,14 @@ class FirebaseService {
   }
 
   static Future<void> _configureBackgroundNotifications() async {
+    if (!_available) return;
+    
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
   static Future<String?> getToken() async {
+    if (!_available) return null;
+    
     if (!_initialized) {
       await initialize();
     }
