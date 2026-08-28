@@ -72,7 +72,8 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // Use debug signing if release signing is not configured
+            signingConfig signingConfigs.release != null ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
