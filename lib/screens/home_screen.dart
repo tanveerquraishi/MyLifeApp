@@ -255,10 +255,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       javaScriptEnabled: AppConstants.enableJavaScript,
                       useShouldOverrideUrlLoading: true,
                       useOnDownloadStart: true,
-                      javaScriptCanOpenWindowsAutomatically: true,
-                      supportZoom: AppConstants.enableZoom,
-                      clearCache: false,
-                      localStorageEnabled: true,
                     ),
                     android: AndroidInAppWebViewOptions(
                       allowFileAccess: true,
