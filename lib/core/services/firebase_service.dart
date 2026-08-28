@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mylifepair_matrimony/firebase_options.dart';
+import '../firebase_options.dart' as options;
 
 class FirebaseService {
   static FirebaseMessaging? _messaging;
@@ -12,7 +12,7 @@ class FirebaseService {
 
     try {
       await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
+        options: options.DefaultFirebaseOptions.currentPlatform,
       );
       
       _messaging = FirebaseMessaging.instance;

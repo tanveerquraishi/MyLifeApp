@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 class PermissionService {
   static final PermissionService _instance = PermissionService._internal();
@@ -164,6 +165,6 @@ class PermissionService {
   }
 
   Future<void> openAppSettings() async {
-    await Permission.camera.openAppSettings();
+    await ph.openAppSettings();
   }
 }

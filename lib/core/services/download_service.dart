@@ -42,7 +42,7 @@ class DownloadService {
 
   static bool isSupportedFileType(String url) {
     final uri = Uri.tryParse(url);
-    if (uri == null || !uri.hasPath) return false;
+    if (uri == null || uri.path.isEmpty) return false;
     
     final path = uri.path.toLowerCase();
     return AppConstants.supportedFileTypes.any((extension) => 
@@ -52,7 +52,7 @@ class DownloadService {
 
   static String getFileNameFromUrl(String url) {
     final uri = Uri.tryParse(url);
-    if (uri == null || !uri.hasPath) return 'download';
+    if (uri == null || uri.path.isEmpty) return 'download';
     
     final path = uri.path;
     final fileName = path.split('/').last;

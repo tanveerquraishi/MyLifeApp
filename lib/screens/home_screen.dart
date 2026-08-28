@@ -5,7 +5,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:mylifepair_matrimony/core/constants/app_constants.dart';
 import 'package:mylifepair_matrimony/core/services/network_service.dart';
 import 'package:mylifepair_matrimony/core/services/download_service.dart';
@@ -24,13 +23,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final NetworkService _networkService = NetworkService();
   final PermissionService _permissionService = PermissionService();
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
   
   InAppWebViewController? _webViewController;
   double _loadingProgress = 0;
   bool _isLoading = true;
   bool _isOffline = false;
   bool _canGoBack = false;
+  bool _isRefreshing = false;
   
   DateTime? _backPressTime;
   bool _hasShownRatingDialog = false;
@@ -144,11 +143,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onRefresh() async {
+  Future<void> _onRefresh() async {
+    setState(() {
+      _isRefreshing = true;
+    });
+    
     if (_webViewController != null) {
       await _webViewController!.reload();
     }
-    _refreshController.refreshCompleted();
+    
+    setState(() {
+      _isRefreshing = false;
+    });
   }
 
   void _onDownloadStart(InAppWebViewController controller, String url) {
@@ -241,21 +247,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   _webViewController?.reload();
                 },
               )
-            : PullToRefresh(
+            : RefreshIndicator(
                 onRefresh: _onRefresh,
-                controller: _refreshController,
                 child: InAppWebView(
-                  initialUrlRequest: URLRequest(url: Uri.parse(AppConstants.websiteUrl)),
+                  initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
                   initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
                       javaScriptEnabled: AppConstants.enableJavaScript,
-                      domStorageEnabled: AppConstants.enableDomStorage,
                       databaseEnabled: true,
                       useShouldOverrideUrlLoading: true,
                       useOnDownloadStart: true,
                       javaScriptCanOpenWindowsAutomatically: true,
                       supportZoom: AppConstants.enableZoom,
                       clearCache: false,
+                      localStorageEnabled: true,
                     ),
                     android: AndroidInAppWebViewOptions(
                       allowFileAccess: true,
@@ -288,7 +293,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   shouldOverrideUrlLoading: (controller, navigationAction) {
                     return _handleNavigation(navigationAction);
                   },
-                  onDownloadStart: _onDownloadStart,
+                  onDownloadStart: (controller, url) {
+                    _onDownloadStart(controller, url.toString());
+                  },
                   onConsoleMessage: (controller, consoleMessage) {
                     if (consoleMessage.messageLevel == ConsoleMessageLevel.ERROR) {
                       debugPrint('WebView Error: ${consoleMessage.message}');

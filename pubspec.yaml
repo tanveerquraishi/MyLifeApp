@@ -38,9 +38,6 @@ dependencies:
   # Device Info
   device_info_plus: ^10.1.0
 
-  # Pull to Refresh
-  pull_to_refresh_flutter3: ^2.0.0
-
   # Shared Preferences
   shared_preferences: ^2.2.2
 
