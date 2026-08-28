@@ -76,7 +76,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _webViewController!.goBack();
       return false;
     } else {
-      // Show exit dialog
       final shouldExit = await _showExitDialog();
       return shouldExit ?? false;
     }
@@ -109,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _backPressTime = currentTime;
     
     if (difference < const Duration(seconds: AppConstants.backPressTimeout)) {
-      // Exit app
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -247,95 +245,73 @@ class _HomeScreenState extends State<HomeScreen> {
                   _webViewController?.reload();
                 },
               )
-            : RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: Stack(
+            : Stack(
                   children: [
                     InAppWebView(
-                  initialUrlRequest: URLRequest(
-                    url: WebUri(AppConstants.websiteUrl),
-                    headers: {
-                      'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36'
-                    }
-                  ),
-                  initialOptions: InAppWebViewGroupOptions(
-                    crossPlatform: InAppWebViewOptions(
-                      javaScriptEnabled: AppConstants.enableJavaScript,
-                      useShouldOverrideUrlLoading: true,
-                      useOnDownloadStart: true,
-                      clearCache: true,
+                      initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
+                      initialOptions: InAppWebViewGroupOptions(
+                        crossPlatform: InAppWebViewOptions(
+                          javaScriptEnabled: true,
+                        ),
+                      ),
+                      onWebViewCreated: (controller) {
+                        _webViewController = controller;
+                        if (kDebugMode) {
+                          print('WebView created successfully');
+                        }
+                      },
+                      onLoadStart: (controller, url) {
+                        if (kDebugMode) {
+                          print('Loading started: $url');
+                        }
+                        setState(() {
+                          _isLoading = true;
+                          _loadingProgress = 0;
+                        });
+                      },
+                      onLoadStop: (controller, url) {
+                        if (kDebugMode) {
+                          print('Loading stopped: $url');
+                        }
+                        setState(() {
+                          _isLoading = false;
+                          _loadingProgress = 1.0;
+                        });
+                      },
+                      onProgressChanged: (controller, progress) {
+                        setState(() {
+                          _loadingProgress = progress / 100;
+                        });
+                      },
+                      onReceivedError: (controller, request, error) {
+                        if (kDebugMode) {
+                          print('WebView error: ${error.description}');
+                          print('Error type: ${error.type}');
+                          print('Failed URL: ${request.url}');
+                        }
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
                     ),
-                    android: AndroidInAppWebViewOptions(
-                      allowFileAccess: true,
-                      allowContentAccess: true,
-                      mixedContentMode: AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
-                      safeBrowsingEnabled: true,
-                      useHybridComposition: true,
-                      domStorageEnabled: true,
-                      databaseEnabled: true,
-                    ),
-                  ),
-                  onWebViewCreated: (controller) {
-                    _webViewController = controller;
-                    if (kDebugMode) {
-                      print('WebView created successfully');
-                    }
-                  },
-                  onLoadStart: (controller, url) {
-                    if (kDebugMode) {
-                      print('Loading started: $url');
-                    }
-                    setState(() {
-                      _isLoading = true;
-                      _loadingProgress = 0;
-                    });
-                  },
-                  onLoadStop: (controller, url) {
-                    if (kDebugMode) {
-                      print('Loading stopped: $url');
-                    }
-                    setState(() {
-                      _isLoading = false;
-                      _loadingProgress = 1.0;
-                    });
-                  },
-                  onProgressChanged: (controller, progress) {
-                    setState(() {
-                      _loadingProgress = progress / 100;
-                    });
-                  },
-                  shouldOverrideUrlLoading: (controller, navigationAction) {
-                    return _handleNavigation(navigationAction);
-                  },
-                  onDownloadStart: (controller, url) {
-                    _onDownloadStart(controller, url.toString());
-                  },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    if (consoleMessage.messageLevel == ConsoleMessageLevel.ERROR) {
-                      debugPrint('WebView Error: ${consoleMessage.message}');
-                    }
-                  },
-                  onReceivedError: (controller, request, error) {
-                    if (kDebugMode) {
-                      print('WebView error: ${error.description}');
-                      print('Error type: ${error.type}');
-                      print('Failed URL: ${request.url}');
-                    }
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  },
-                  onUpdateVisitedHistory: (controller, url, isReload) {
-                    _updateCanGoBack();
-                  },
-                ),
                     if (_isLoading)
-                      const Center(
-                        child: CircularProgressIndicator(),
+                      Container(
+                        color: Colors.white,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 16),
+                              Text('Loading: ${(_loadingProgress * 100).toInt()}%'),
+                              SizedBox(height: 8),
+                              Text('Loading MyLifePair...'),
+                            ],
+                          ),
+                        ),
                       ),
                   ],
                 ),
-              ),
       ),
     );
   }
