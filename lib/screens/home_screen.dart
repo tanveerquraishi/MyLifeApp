@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -248,13 +249,16 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             : RefreshIndicator(
                 onRefresh: _onRefresh,
-                child: InAppWebView(
+                child: Stack(
+                  children: [
+                    InAppWebView(
                   initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
                   initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
                       javaScriptEnabled: AppConstants.enableJavaScript,
                       useShouldOverrideUrlLoading: true,
                       useOnDownloadStart: true,
+                      clearCache: true,
                     ),
                     android: AndroidInAppWebViewOptions(
                       allowFileAccess: true,
@@ -266,14 +270,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   onWebViewCreated: (controller) {
                     _webViewController = controller;
+                    if (kDebugMode) {
+                      print('WebView created successfully');
+                    }
                   },
                   onLoadStart: (controller, url) {
+                    if (kDebugMode) {
+                      print('Loading started: $url');
+                    }
                     setState(() {
                       _isLoading = true;
                       _loadingProgress = 0;
                     });
                   },
                   onLoadStop: (controller, url) {
+                    if (kDebugMode) {
+                      print('Loading stopped: $url');
+                    }
                     setState(() {
                       _isLoading = false;
                       _loadingProgress = 1.0;
@@ -296,13 +309,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                   onReceivedError: (controller, request, error) {
+                    if (kDebugMode) {
+                      print('WebView error: ${error.description}');
+                      print('Error type: ${error.type}');
+                      print('Failed URL: ${request.url}');
+                    }
                     setState(() {
                       _isLoading = false;
                     });
                   },
+                  onConsoleMessage: (controller, consoleMessage) {
+                    if (consoleMessage.messageLevel == ConsoleMessageLevel.ERROR) {
+                      debugPrint('WebView Error: ${consoleMessage.message}');
+                    }
+                  },
                   onUpdateVisitedHistory: (controller, url, isReload) {
                     _updateCanGoBack();
                   },
+                ),
+                    if (_isLoading)
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                  ],
                 ),
               ),
       ),
