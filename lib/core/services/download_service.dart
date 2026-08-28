@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mylifepair_matrimony/core/constants/app_constants.dart';
@@ -75,69 +74,42 @@ class DownloadService {
     try {
       // Check if file type is supported
       if (!isSupportedFileType(url)) {
-        Fluttertoast.showToast(
-          msg: 'File type not supported',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+        if (kDebugMode) print('File type not supported');
         return;
       }
 
       // Request storage permission
       final hasPermission = await requestStoragePermission();
       if (!hasPermission) {
-        Fluttertoast.showToast(
-          msg: 'Storage permission required',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+        if (kDebugMode) print('Storage permission required');
         return;
       }
 
       // Get download path
       final downloadPath = await getDownloadPath();
       if (downloadPath == null) {
-        Fluttertoast.showToast(
-          msg: 'Unable to access downloads folder',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+        if (kDebugMode) print('Unable to access downloads folder');
         return;
       }
 
-      // Show download started toast
-      Fluttertoast.showToast(
-        msg: 'Download Started',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+      // Show download started
+      if (kDebugMode) print('Download Started');
 
       // Get file name
       final fileName = getFileNameFromUrl(url);
       final filePath = '$downloadPath/$fileName';
 
       // Download file (this is a placeholder - actual implementation would use http package)
-      // For now, we'll just show the completion toast
+      // For now, we'll just show the completion
       await Future.delayed(const Duration(seconds: 2)); // Simulate download
 
-      Fluttertoast.showToast(
-        msg: 'Download Completed',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-
       if (kDebugMode) {
+        print('Download Completed');
         print('File downloaded to: $filePath');
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: 'Download failed: $e',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-      
       if (kDebugMode) {
-        print('Download error: $e');
+        print('Download failed: $e');
       }
     }
   }

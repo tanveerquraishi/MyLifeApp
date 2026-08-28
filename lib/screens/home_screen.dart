@@ -4,7 +4,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mylifepair_matrimony/core/constants/app_constants.dart';
 import 'package:mylifepair_matrimony/core/services/network_service.dart';
 import 'package:mylifepair_matrimony/core/services/download_service.dart';
@@ -112,10 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
       // Exit app
       Navigator.of(context).pop();
     } else {
-      Fluttertoast.showToast(
-        msg: 'Press back again to exit',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Press back again to exit'),
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }

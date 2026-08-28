@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
@@ -157,11 +156,9 @@ class PermissionService {
   }
 
   void _showPermissionDeniedDialog(String permissionName) {
-    Fluttertoast.showToast(
-      msg: '$permissionName permission permanently denied. Please enable in app settings.',
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-    );
+    if (kDebugMode) {
+      print('$permissionName permission permanently denied. Please enable in app settings.');
+    }
   }
 
   Future<void> openAppSettings() async {
