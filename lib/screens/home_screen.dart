@@ -35,6 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
               initialOptions: InAppWebViewGroupOptions(
                 crossPlatform: InAppWebViewOptions(
                   javaScriptEnabled: true,
+                  useShouldOverrideUrlLoading: true,
+                  clearCache: true,
+                ),
+                android: AndroidInAppWebViewOptions(
+                  allowFileAccess: true,
+                  allowContentAccess: true,
+                  mixedContentMode: AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+                  domStorageEnabled: true,
+                  databaseEnabled: true,
+                  useHybridComposition: true,
                 ),
               ),
               onWebViewCreated: (controller) {
