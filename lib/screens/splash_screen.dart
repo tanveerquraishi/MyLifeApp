@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mylifepair_matrimony/core/constants/app_constants.dart';
 import 'package:mylifepair_matrimony/screens/home_screen.dart';
 import 'package:mylifepair_matrimony/utils/app_rating.dart';
@@ -11,24 +12,72 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String _status = 'Starting...';
+
   @override
   void initState() {
     super.initState();
+    if (kDebugMode) {
+      print('SplashScreen: initState called');
+    }
     _initializeApp();
   }
 
   Future<void> _initializeApp() async {
-    // Increment launch count for rating
-    await AppRating.incrementLaunchCount();
-    
-    // Wait for splash duration
-    await Future.delayed(const Duration(seconds: AppConstants.splashDuration));
-    
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+    try {
+      setState(() {
+        _status = 'Initializing app...';
+      });
+      if (kDebugMode) {
+        print('SplashScreen: Starting initialization');
+      }
+
+      // Increment launch count for rating
+      setState(() {
+        _status = 'Setting up rating...';
+      });
+      await AppRating.incrementLaunchCount();
+      if (kDebugMode) {
+        print('SplashScreen: Rating count incremented');
+      }
+      
+      // Wait for splash duration
+      setState(() {
+        _status = 'Loading...';
+      });
+      await Future.delayed(const Duration(seconds: AppConstants.splashDuration));
+      if (kDebugMode) {
+        print('SplashScreen: Splash duration completed');
+      }
+      
+      setState(() {
+        _status = 'Navigating to home...';
+      });
+      if (kDebugMode) {
+        print('SplashScreen: Navigating to HomeScreen');
+      }
+      
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('SplashScreen error: $e');
+      }
+      setState(() {
+        _status = 'Error: $e';
+      });
+      
+      // Even if there's an error, try to navigate to home screen
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
     }
   }
 
@@ -89,6 +138,17 @@ class _SplashScreenState extends State<SplashScreen> {
             // Loading indicator
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+            const SizedBox(height: 16),
+            
+            // Status text
+            Text(
+              _status,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white70,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

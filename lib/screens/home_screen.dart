@@ -26,100 +26,120 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: Stack(
-        children: [
-          InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
-            initialOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                javaScriptEnabled: true,
+      body: Container(
+        color: Colors.white,
+        child: Stack(
+          children: [
+            InAppWebView(
+              initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
+              initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                  javaScriptEnabled: true,
+                ),
               ),
+              onWebViewCreated: (controller) {
+                _webViewController = controller;
+                setState(() {
+                  _status = 'WebView created';
+                });
+                if (kDebugMode) {
+                  print('WebView created');
+                }
+              },
+              onLoadStart: (controller, url) {
+                setState(() {
+                  _isLoading = true;
+                  _status = 'Loading: $url';
+                });
+                if (kDebugMode) {
+                  print('Loading started: $url');
+                }
+              },
+              onLoadStop: (controller, url) {
+                setState(() {
+                  _isLoading = false;
+                  _status = 'Loaded: $url';
+                });
+                if (kDebugMode) {
+                  print('Loading stopped: $url');
+                }
+              },
+              onProgressChanged: (controller, progress) {
+                setState(() {
+                  _loadingProgress = progress / 100;
+                });
+              },
+              onReceivedError: (controller, request, error) {
+                setState(() {
+                  _error = 'Error: ${error.description}';
+                  _status = 'Error loading';
+                });
+                if (kDebugMode) {
+                  print('WebView error: ${error.description}');
+                }
+              },
             ),
-            onWebViewCreated: (controller) {
-              _webViewController = controller;
-              setState(() {
-                _status = 'WebView created';
-              });
-              if (kDebugMode) {
-                print('WebView created');
-              }
-            },
-            onLoadStart: (controller, url) {
-              setState(() {
-                _isLoading = true;
-                _status = 'Loading: $url';
-              });
-              if (kDebugMode) {
-                print('Loading started: $url');
-              }
-            },
-            onLoadStop: (controller, url) {
-              setState(() {
-                _isLoading = false;
-                _status = 'Loaded: $url';
-              });
-              if (kDebugMode) {
-                print('Loading stopped: $url');
-              }
-            },
-            onProgressChanged: (controller, progress) {
-              setState(() {
-                _loadingProgress = progress / 100;
-              });
-            },
-            onReceivedError: (controller, request, error) {
-              setState(() {
-                _error = 'Error: ${error.description}';
-                _status = 'Error loading';
-              });
-              if (kDebugMode) {
-                print('WebView error: ${error.description}');
-              }
-            },
-          ),
-          if (_isLoading)
-            Container(
-              color: Colors.white,
-              child: Center(
+            if (_isLoading)
+              Container(
+                color: Colors.white,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Loading: ${(_loadingProgress * 100).toInt()}%'),
+                      SizedBox(height: 8),
+                      Text('Loading MyLifePair...'),
+                      SizedBox(height: 8),
+                      Text(_status, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+            if (_error.isNotEmpty)
+              Container(
+                color: Colors.red.shade100,
+                padding: EdgeInsets.all(16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('Loading: ${(_loadingProgress * 100).toInt()}%'),
+                    Text('WebView Error:', style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
-                    Text('Loading MyLifePair...'),
+                    Text(_error),
                     SizedBox(height: 8),
-                    Text(_status, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _error = '';
+                          _status = 'Retrying...';
+                        });
+                        _webViewController?.reload();
+                      },
+                      child: Text('Retry'),
+                    ),
                   ],
                 ),
               ),
-            ),
-          if (_error.isNotEmpty)
-            Container(
-              color: Colors.red.shade100,
-              padding: EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('WebView Error:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  Text(_error),
-                  SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _error = '';
-                        _status = 'Retrying...';
-                      });
-                      _webViewController?.reload();
-                    },
-                    child: Text('Retry'),
-                  ),
-                ],
+            // Always show status for debugging
+            Positioned(
+              top: 10,
+              left: 10,
+              right: 10,
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.yellow.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _status,
+                  style: TextStyle(fontSize: 12, color: Colors.black),
+                ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
