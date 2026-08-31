@@ -30,64 +30,78 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.white,
         child: Stack(
           children: [
-            InAppWebView(
-              initialUrlRequest: URLRequest(url: WebUri(AppConstants.websiteUrl)),
-              initialOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(
-                  javaScriptEnabled: true,
-                  useShouldOverrideUrlLoading: true,
-                  clearCache: true,
+            Positioned.fill(
+              child: InAppWebView(
+                initialUrlRequest: URLRequest(
+                  url: WebUri(AppConstants.websiteUrl),
+                  headers: {
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1',
+                  },
                 ),
-                android: AndroidInAppWebViewOptions(
-                  allowFileAccess: true,
-                  allowContentAccess: true,
-                  mixedContentMode: AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
-                  domStorageEnabled: true,
-                  databaseEnabled: true,
-                  useHybridComposition: true,
+                initialOptions: InAppWebViewGroupOptions(
+                  crossPlatform: InAppWebViewOptions(
+                    javaScriptEnabled: true,
+                    useShouldOverrideUrlLoading: true,
+                    clearCache: true,
+                    userAgent: 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
+                  ),
+                  android: AndroidInAppWebViewOptions(
+                    allowFileAccess: true,
+                    allowContentAccess: true,
+                    mixedContentMode: AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+                    domStorageEnabled: true,
+                    databaseEnabled: true,
+                    useHybridComposition: true,
+                    thirdPartyCookiesEnabled: true,
+                  ),
                 ),
+                onWebViewCreated: (controller) {
+                  _webViewController = controller;
+                  setState(() {
+                    _status = 'WebView created';
+                  });
+                  if (kDebugMode) {
+                    print('WebView created');
+                  }
+                },
+                onLoadStart: (controller, url) {
+                  setState(() {
+                    _isLoading = true;
+                    _status = 'Loading: $url';
+                  });
+                  if (kDebugMode) {
+                    print('Loading started: $url');
+                  }
+                },
+                onLoadStop: (controller, url) {
+                  setState(() {
+                    _isLoading = false;
+                    _status = 'Loaded: $url';
+                  });
+                  if (kDebugMode) {
+                    print('Loading stopped: $url');
+                  }
+                },
+                onProgressChanged: (controller, progress) {
+                  setState(() {
+                    _loadingProgress = progress / 100;
+                  });
+                },
+                onReceivedError: (controller, request, error) {
+                  setState(() {
+                    _error = 'Error: ${error.description}';
+                    _status = 'Error loading';
+                  });
+                  if (kDebugMode) {
+                    print('WebView error: ${error.description}');
+                  }
+                },
               ),
-              onWebViewCreated: (controller) {
-                _webViewController = controller;
-                setState(() {
-                  _status = 'WebView created';
-                });
-                if (kDebugMode) {
-                  print('WebView created');
-                }
-              },
-              onLoadStart: (controller, url) {
-                setState(() {
-                  _isLoading = true;
-                  _status = 'Loading: $url';
-                });
-                if (kDebugMode) {
-                  print('Loading started: $url');
-                }
-              },
-              onLoadStop: (controller, url) {
-                setState(() {
-                  _isLoading = false;
-                  _status = 'Loaded: $url';
-                });
-                if (kDebugMode) {
-                  print('Loading stopped: $url');
-                }
-              },
-              onProgressChanged: (controller, progress) {
-                setState(() {
-                  _loadingProgress = progress / 100;
-                });
-              },
-              onReceivedError: (controller, request, error) {
-                setState(() {
-                  _error = 'Error: ${error.description}';
-                  _status = 'Error loading';
-                });
-                if (kDebugMode) {
-                  print('WebView error: ${error.description}');
-                }
-              },
             ),
             if (_isLoading)
               Container(
@@ -131,23 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-            // Always show status for debugging
-            Positioned(
-              top: 10,
-              left: 10,
-              right: 10,
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.yellow.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _status,
-                  style: TextStyle(fontSize: 12, color: Colors.black),
-                ),
-              ),
-            ),
           ],
         ),
       ),
